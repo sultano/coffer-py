@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "coffer"
+name = "coffer-config"
 version = "0.1.0"
 description = "Typed config reader for resolved Coffer config files"
 readme = "README.md"
@@ -27,8 +27,8 @@ dependencies = ["pyyaml>=6.0"]
 dev = ["pytest", "pytest-cov", "ruff", "mypy", "types-PyYAML", "pre-commit"]
 
 [project.urls]
-Repository = "https://github.com/sul/coffer-py"
-Issues = "https://github.com/sul/coffer-py/issues"
+Repository = "https://github.com/sultano/coffer-py"
+Issues = "https://github.com/sultano/coffer-py/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/coffer"]

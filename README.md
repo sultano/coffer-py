@@ -7,7 +7,7 @@ Coffer is a Go CLI that merges YAML configs, resolves secrets from GCP Secret Ma
 ## Install
 
 ```bash
-pip install coffer
+pip install coffer-config
 ```
 
 ## Usage
