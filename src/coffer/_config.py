@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import copy
 import json
+from collections.abc import Iterator, Mapping
 from pathlib import Path
-from typing import Any, Iterator, TypeVar
+from typing import Any, TypeVar
 
 import yaml
 
@@ -19,7 +20,15 @@ class CofferError(Exception):
     """Base exception for all coffer errors."""
 
 
-class Config:
+class Config(Mapping[str, Any]):
+    """Typed config reader for resolved Coffer config files.
+
+    Supports dot-notation for nested access (e.g. ``config.get("database.host")``).
+
+    Note: keys containing literal dots are not accessible via dot-notation.
+    Use ``config.to_dict()`` to access them directly if needed.
+    """
+
     __slots__ = ("_data",)
 
     def __init__(self, data: dict[str, Any]) -> None:
@@ -53,7 +62,7 @@ class Config:
 
         return cls(data)
 
-    def get(
+    def get(  # type: ignore[override]
         self, key: str, *, default: Any = _MISSING, type: type[T] | None = None
     ) -> Any:
         try:
@@ -76,7 +85,9 @@ class Config:
             return Config(value)
         return value
 
-    def __contains__(self, key: str) -> bool:
+    def __contains__(self, key: object) -> bool:
+        if not isinstance(key, str):
+            return False
         try:
             self._traverse(key)
             return True
@@ -110,7 +121,7 @@ class Config:
         return current
 
 
-def _coerce(value: Any, tp: type, key: str) -> Any:
+def _coerce(value: Any, tp: type[Any], key: str) -> Any:
     if tp is bool:
         if isinstance(value, bool):
             return value
@@ -137,6 +148,4 @@ def _coerce(value: Any, tp: type, key: str) -> Any:
     try:
         return tp(value)
     except (ValueError, TypeError) as e:
-        raise TypeError(
-            f"Cannot coerce {value!r} to {tp.__name__} for key '{key}'"
-        ) from e
+        raise TypeError(f"Cannot coerce {value!r} to {tp.__name__} for key '{key}'") from e

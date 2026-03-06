@@ -35,6 +35,10 @@ list(config)               # top-level keys
 config.to_dict()
 ```
 
+## Limitations
+
+- **Dot-separated keys**: Keys containing literal dots (e.g. `{"a.b": 1}`) are not accessible via dot-notation. Use `config.to_dict()` to access them directly.
+
 ## Type coercion
 
 The `type=` parameter on `get()` coerces values:

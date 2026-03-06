@@ -4,7 +4,6 @@ import pytest
 
 from coffer import CofferError, Config
 
-
 # --- __init__ and to_dict ---
 
 
@@ -96,7 +95,7 @@ class TestGetBasic:
 
     def test_missing_key_raises_keyerror(self):
         config = Config({"a": 1})
-        with pytest.raises(KeyError, match="missing.key"):
+        with pytest.raises(KeyError, match=r"missing\.key"):
             config.get("missing.key")
 
     def test_missing_key_with_default(self):
@@ -191,6 +190,11 @@ class TestGetTypeCoercion:
         with pytest.raises(TypeError, match="Cannot coerce"):
             config.get("port", type=int)
 
+    def test_list_from_non_coercible_raises_typeerror(self):
+        config = Config({"val": 42})
+        with pytest.raises(TypeError, match="Cannot coerce"):
+            config.get("val", type=list)
+
     def test_type_applied_to_default(self):
         config = Config({})
         assert config.get("port", default="8080", type=int) == 8080
@@ -248,6 +252,10 @@ class TestContains:
         config = Config({"database": {"host": "localhost"}})
         assert "database.missing" not in config
 
+    def test_non_string_key_returns_false(self):
+        config = Config({"a": 1})
+        assert 42 not in config  # type: ignore[operator]
+
 
 # --- __iter__ and __len__ ---
 
@@ -274,6 +282,31 @@ class TestEq:
 
     def test_not_equal_to_non_config(self):
         assert Config({"a": 1}) != {"a": 1}
+
+
+# --- __repr__ ---
+
+
+# --- Mapping protocol ---
+
+
+class TestMappingProtocol:
+    def test_keys(self):
+        config = Config({"a": 1, "b": 2})
+        assert set(config.keys()) == {"a", "b"}
+
+    def test_values(self):
+        config = Config({"a": 1, "b": 2})
+        assert sorted(config.values()) == [1, 2]
+
+    def test_items(self):
+        config = Config({"a": 1})
+        assert list(config.items()) == [("a", 1)]
+
+    def test_isinstance_mapping(self):
+        from collections.abc import Mapping
+
+        assert isinstance(Config({}), Mapping)
 
 
 # --- __repr__ ---
