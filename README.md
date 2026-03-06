@@ -35,13 +35,6 @@ list(config)               # top-level keys
 config.to_dict()
 ```
 
-## Development
-
-```bash
-pip install -e ".[dev]"
-pre-commit install
-```
-
 
 ## Limitations
 
