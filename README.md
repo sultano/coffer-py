@@ -1,13 +1,13 @@
-# coffer-config
+# coffer
 
-Typed config reader for resolved [Coffer](https://github.com/sul/coffer) config files.
+Typed config reader for resolved [Coffer](https://github.com/sultano/coffer) config files.
 
 Coffer is a Go CLI that merges YAML configs, resolves secrets from GCP Secret Manager, and outputs a resolved config file. This library reads those pre-resolved files and provides ergonomic, type-safe access. No secret resolution, no GCP dependency.
 
 ## Install
 
 ```bash
-pip install coffer-config
+pip install coffer
 ```
 
 ## Usage
