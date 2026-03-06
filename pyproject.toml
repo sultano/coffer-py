@@ -9,6 +9,7 @@ description = "Typed config reader for resolved Coffer config files"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
+keywords = ["config", "configuration", "yaml", "json", "typed", "type-safe", "settings"]
 authors = [{ name = "Suleman" }]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -29,6 +30,7 @@ dev = ["pytest", "pytest-cov", "ruff", "mypy", "types-PyYAML", "pre-commit"]
 [project.urls]
 Repository = "https://github.com/sultano/coffer-py"
 Issues = "https://github.com/sultano/coffer-py/issues"
+Changelog = "https://github.com/sultano/coffer-py/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/coffer"]
