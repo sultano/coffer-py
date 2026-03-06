@@ -24,7 +24,7 @@ classifiers = [
 dependencies = ["pyyaml>=6.0"]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-cov", "ruff", "mypy", "types-PyYAML"]
+dev = ["pytest", "pytest-cov", "ruff", "mypy", "types-PyYAML", "pre-commit"]
 
 [project.urls]
 Repository = "https://github.com/sul/coffer-py"
