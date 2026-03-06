@@ -24,6 +24,12 @@ class TestInitAndToDict:
         config = Config({})
         assert config.to_dict() == {}
 
+    def test_constructor_copies_input(self):
+        original = {"key": "value"}
+        config = Config(original)
+        original["key"] = "changed"
+        assert config.get("key") == "value"
+
 
 # --- from_file ---
 
@@ -101,11 +107,20 @@ class TestGetBasic:
         config = Config({})
         assert config.get("missing", default=None) is None
 
+    def test_missing_intermediate_with_default(self):
+        config = Config({"a": {"b": 1}})
+        assert config.get("a.x.y", default="fallback") == "fallback"
+
     def test_returns_raw_types(self):
         config = Config({"i": 42, "l": [1, 2], "d": {"a": 1}})
         assert config.get("i") == 42
         assert config.get("l") == [1, 2]
-        assert config.get("d") == {"a": 1}
+
+    def test_nested_dict_returns_config(self):
+        config = Config({"d": {"a": 1}})
+        sub = config.get("d")
+        assert isinstance(sub, Config)
+        assert sub.get("a") == 1
 
 
 # --- get: type coercion ---
@@ -145,6 +160,19 @@ class TestGetTypeCoercion:
     def test_bool_passthrough(self):
         config = Config({"flag": True})
         assert config.get("flag", type=bool) is True
+
+    def test_bool_from_int_one(self):
+        config = Config({"flag": 1})
+        assert config.get("flag", type=bool) is True
+
+    def test_bool_from_int_zero(self):
+        config = Config({"flag": 0})
+        assert config.get("flag", type=bool) is False
+
+    def test_bool_from_int_other_raises(self):
+        config = Config({"flag": 2})
+        with pytest.raises(TypeError, match="Cannot coerce"):
+            config.get("flag", type=bool)
 
     def test_str_from_int(self):
         config = Config({"port": 5432})
@@ -190,6 +218,14 @@ class TestGetItem:
     def test_chained_access(self):
         config = Config({"a": {"b": {"c": 1}}})
         assert config["a"]["b"]["c"] == 1
+
+    def test_dot_notation(self):
+        config = Config({"a": {"b": 1}})
+        assert config["a.b"] == 1
+
+    def test_list_value(self):
+        config = Config({"items": [1, 2, 3]})
+        assert config["items"] == [1, 2, 3]
 
 
 # --- __contains__ ---

@@ -23,7 +23,7 @@ class Config:
     __slots__ = ("_data",)
 
     def __init__(self, data: dict[str, Any]) -> None:
-        self._data = data
+        self._data = copy.deepcopy(data)
 
     @classmethod
     def from_file(cls, path: str | Path) -> Config:
@@ -66,10 +66,12 @@ class Config:
         if type is not None:
             value = _coerce(value, type, key)
 
+        if isinstance(value, dict):
+            return Config(value)
         return value
 
     def __getitem__(self, key: str) -> Any:
-        value = self._data[key]
+        value = self._traverse(key)
         if isinstance(value, dict):
             return Config(value)
         return value
@@ -112,6 +114,11 @@ def _coerce(value: Any, tp: type, key: str) -> Any:
     if tp is bool:
         if isinstance(value, bool):
             return value
+        if isinstance(value, int):
+            if value == 1:
+                return True
+            if value == 0:
+                return False
         if isinstance(value, str):
             low = value.lower()
             if low in _BOOL_TRUE:
