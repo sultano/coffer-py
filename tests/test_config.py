@@ -2,7 +2,18 @@ from __future__ import annotations
 
 import pytest
 
-from coffer import CofferError, Config
+from coffer import CofferError, Config, __version__
+
+# --- __version__ ---
+
+
+class TestVersion:
+    def test_version_is_string(self):
+        assert isinstance(__version__, str)
+
+    def test_version_is_not_empty(self):
+        assert len(__version__) > 0
+
 
 # --- __init__ and to_dict ---
 
@@ -28,6 +39,25 @@ class TestInitAndToDict:
         config = Config(original)
         original["key"] = "changed"
         assert config.get("key") == "value"
+
+
+# --- from_dict ---
+
+
+class TestFromDict:
+    def test_creates_config(self):
+        config = Config.from_dict({"key": "value"})
+        assert config.get("key") == "value"
+
+    def test_deep_copies_input(self):
+        original = {"nested": {"a": 1}}
+        config = Config.from_dict(original)
+        original["nested"]["a"] = 999
+        assert config.get("nested.a") == 1
+
+    def test_empty_dict(self):
+        config = Config.from_dict({})
+        assert config.to_dict() == {}
 
 
 # --- from_file ---
@@ -75,6 +105,18 @@ class TestFromFile:
         path = tmp_json_config([1, 2, 3], name="list.json")
         with pytest.raises(CofferError, match="mapping at the root"):
             Config.from_file(path)
+
+    def test_empty_file(self, tmp_path):
+        p = tmp_path / "empty.yaml"
+        p.write_text("")
+        with pytest.raises(CofferError, match="Config file is empty"):
+            Config.from_file(p)
+
+    def test_empty_json_file(self, tmp_path):
+        p = tmp_path / "empty.json"
+        p.write_text("")
+        with pytest.raises(CofferError, match="Failed to parse"):
+            Config.from_file(p)
 
 
 # --- get: basic access ---

@@ -27,12 +27,25 @@ class Config(Mapping[str, Any]):
 
     Note: keys containing literal dots are not accessible via dot-notation.
     Use ``config.to_dict()`` to access them directly if needed.
+
+    Thread safety: ``Config`` instances are effectively immutable after construction.
+    The internal data is deep-copied on creation, and no mutation methods are exposed.
+    This makes ``Config`` safe to share across threads without synchronization.
     """
 
     __slots__ = ("_data",)
 
     def __init__(self, data: dict[str, Any]) -> None:
         self._data = copy.deepcopy(data)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> Config:
+        """Create a Config from a dictionary.
+
+        This is the preferred factory when constructing from code or test data.
+        The input dict is deep-copied, so later mutations do not affect the Config.
+        """
+        return cls(data)
 
     @classmethod
     def from_file(cls, path: str | Path) -> Config:
@@ -54,6 +67,9 @@ class Config(Mapping[str, Any]):
                 data = yaml.safe_load(text)
         except (json.JSONDecodeError, yaml.YAMLError) as e:
             raise CofferError(f"Failed to parse {path.name}: {e}") from e
+
+        if data is None:
+            raise CofferError("Config file is empty")
 
         if not isinstance(data, dict):
             raise CofferError(
