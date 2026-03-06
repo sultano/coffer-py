@@ -42,6 +42,7 @@ pip install -e ".[dev]"
 pre-commit install
 ```
 
+
 ## Limitations
 
 - **Dot-separated keys**: Keys containing literal dots (e.g. `{"a.b": 1}`) are not accessible via dot-notation. Use `config.to_dict()` to access them directly.
