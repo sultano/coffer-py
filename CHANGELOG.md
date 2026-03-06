@@ -17,7 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Empty config files now raise a clear `CofferError("Config file is empty")` instead of a confusing `NoneType` message
 
-## [0.1.0] - 2024-12-01
+## [0.1.0] - 2026-03-06
 
 ### Added
 
